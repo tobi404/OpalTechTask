@@ -16,14 +16,19 @@ struct ReferedFriendsView: View {
         return Double(vm.friends.count) / Double(count)
     }
     
+    var canClaim: Bool {
+        vm.friends.count >= (vm.nextReward?.friendCountToUnlock ?? 0)
+    }
+    
     var body: some View {
         GroupBox {
             HStack {
-                Image("person")
+                Image(vm.nextReward?.imageName ?? "person")
                     .resizable()
                     .scaledToFill()
                     .frame(width: 72, height: 72)
                     .clipShape(.rect(cornerRadius: 10))
+                    .redacted(reason: vm.nextReward == nil ? .placeholder : [])
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Next Unlock:")
@@ -39,11 +44,23 @@ struct ReferedFriendsView: View {
                         Text("\(vm.friends.count)/\(vm.nextReward?.friendCountToUnlock ?? 0)")
                             .foregroundStyle(.opalSecondary)
                             .font(.opalFootnote(.semibold))
+                            .opacity(canClaim ? 0 : 1)
                     }
                     .redacted(reason: vm.nextReward == nil ? .placeholder : [])
                     
                     ProgressBar(progress: progress)
                         .padding(.top, 4)
+                        .opacity(canClaim ? 0 : 1)
+                }
+                
+                if
+                    let nextReward = vm.nextReward,
+                    canClaim
+                {
+                    ClaimButton(
+                        action: vm.claimDidTapped,
+                        reward: nextReward
+                    )
                 }
             }
         } label: {
@@ -57,14 +74,20 @@ struct ReferedFriendsView: View {
                     HStack(spacing: 2) {
                         Image(systemName: "person.fill")
                             .font(.footnote)
+                            .opacity(vm.friends.isEmpty ? 0 : 1)
                         
                         Text("\(vm.friends.count)")
+                            .redacted(reason: vm.nextReward == nil ? .placeholder : [])
                             .font(.opalBody(.semibold))
+                            .opacity(vm.friends.isEmpty ? 0 : 1)
                     }
                     
-                    FriendsStack(friends: vm.friends)
-                        .padding(.leading, .opalTiny)
+                    if !vm.friends.isEmpty {
+                        FriendsStack(friends: vm.friends)
+                            .padding(.leading, .opalTiny)
+                    }
                 }
+                .animation(.smooth, value: vm.friends.isEmpty)
             }
             .foregroundStyle(.opalPrimary)
         }

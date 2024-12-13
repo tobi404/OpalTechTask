@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RefferalScreen: View {
     @State var vm = RefferalViewModel()
+    @State var appear = false
     
     var body: some View {
         ScrollView {
@@ -44,6 +45,7 @@ struct RefferalScreen: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .buttonBorderShape(.capsule)
+                .opacity(vm.rewards.isEmpty ? 0 : 1)
                 
                 LazyVStack {
                     ForEach(vm.rewards) { reward in
@@ -56,6 +58,7 @@ struct RefferalScreen: View {
                                     .padding(.vertical, .opalSmall)
                             }
                         }
+                        .transition(.blurReplace)
                     }
                 }
             }
@@ -67,7 +70,11 @@ struct RefferalScreen: View {
             }
         }
         .background(.opalBackground)
+        .animation(.smooth, value: vm.rewards)
         .onAppear(perform: vm.onAppear)
+        .task {
+            await vm.viewTask()
+        }
         .environment(vm)
     }
 }

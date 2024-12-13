@@ -11,73 +11,86 @@ import SwiftUI
 final class RefferalViewModel {
     var friends = [FriendModel]()
     var rewards = [RewardModel]()
-    var nextReward: RewardModel? = RewardModel.init(friendCountToUnlock: 5, title: "Title", description: "Description", imageName: "image", claimed: false)
-        
+    var nextReward: RewardModel?
+    
+    private let refferalListener = RefferalListener()
+    private var premiumUser = false
+    
     func onAppear() {
+        refferalListener.startEmission()
+    }
+    
+    func viewTask() async {
         Task {
             await loadData()
         }
+        await listenForRewards()
     }
     
     func claimDidTapped(for reward: RewardModel) {
         for i in rewards.indices where rewards[i] == reward {
             rewards[i].claimed = true
         }
+        
+        if nextReward == reward {
+            nextReward?.claimed = true
+        }
     }
 }
 
 private extension RefferalViewModel {
     func loadData() async {
-        try? await Task.sleep(for: .seconds(1))
+        premiumUser = await isUserPremium()
         
-        friends = [
+        friends = await getFriends()
+    }
+    
+    func isUserPremium() async -> Bool {
+        try? await Task.sleep(for: .seconds(0.3))
+        
+        return true
+    }
+    
+    func getFriends() async -> [FriendModel] {
+        try? await Task.sleep(for: .seconds(0.2))
+        
+        return [
             FriendModel(profileImageName: "person"),
             FriendModel(profileImageName: "person"),
             FriendModel(profileImageName: "person")
         ]
-        rewards = [
-            RewardModel.init(
-                friendCountToUnlock: 1,
-                title: "Loyal Gem",
-                description: "Unlock this special milestone",
-                imageName: "reward1",
-                claimed: true
-            ),
-            RewardModel.init(
-                friendCountToUnlock: 3,
-                title: "Soulful Gem",
-                description: "Unlock this special milestone",
-                imageName: "reward2",
-                claimed: false
-            ),
-            RewardModel.init(
-                friendCountToUnlock: 5,
-                title: "1 Year of Opal Pro",
-                description: "Unlock one whole year of Opal Pro for Free",
-                imageName: "reward3",
-                claimed: false
-            ),
-            RewardModel.init(
-                friendCountToUnlock: 10,
-                title: "Popular gem",
-                description: "Unlock this special milestone",
-                imageName: "reward4",
-                claimed: false
-            ),
-            RewardModel.init(
-                friendCountToUnlock: 20,
-                title: "Special Gift",
-                description: "Contact us to receive a special gift from the Opal Team",
-                imageName: "reward5",
-                claimed: false
-            ),
-            RewardModel.init(
-                friendCountToUnlock: 100,
-                title: "Mistery Gift",
-                description: "Contact us to receive a life changing gift from Opal",
-                imageName: "reward6",
-                claimed: false
-            )
-        ]
+    }
+    
+    func listenForRewards() async {
+        for await rewards in refferalListener.rewardsStream {
+            self.rewards.append(contentsOf: rewards)
+            determineNextReward()
+        }
+    }
+    
+    func determineNextReward() {
+        if premiumUser {
+            rewards = rewards
+                .filter {
+                    $0.excludePremium == false
+                }
+        }
+        
+        for i in rewards.indices {
+            let reward = rewards[i]
+            
+            if
+                reward.claimed == false,
+                reward.friendCountToUnlock <= friends.count
+            {
+                nextReward = reward
+                break
+            }
+            
+            if reward.friendCountToUnlock > friends.count {
+                nextReward = reward
+                break
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ struct RewardModel: Identifiable {
     let title: String
     let description: String
     let imageName: String
+    let excludePremium: Bool
     var claimed: Bool
 }
 

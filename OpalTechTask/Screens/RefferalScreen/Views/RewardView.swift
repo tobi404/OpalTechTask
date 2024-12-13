@@ -49,7 +49,7 @@ struct RewardView: View {
                     .foregroundStyle(.opalSecondary)
                 
                 if progressReached {
-                    unlockButton
+                    ClaimButton(action: vm.claimDidTapped, reward: reward)
                         .padding(.top, .opalSmall)
                 } else {
                     ProgressBar(progress: progressBarValue)
@@ -65,33 +65,10 @@ struct RewardView: View {
                 .foregroundStyle(.opalBorder)
         }
     }
-    
-    var unlockButton: some View {
-        Button {
-            vm.claimDidTapped(for: reward)
-        } label: {
-            HStack(spacing: 2) {
-                if reward.claimed {
-                    Image(systemName: "checkmark")
-                }
-                
-                Text(reward.claimed ? "Claimed" : "Claim")
-            }
-            .foregroundStyle(reward.claimed ? .gray : .black)
-            .frame(minWidth: 68)
-            .font(.opalFootnote(.regular))
-            .padding(.vertical, .opalTiny)
-        }
-        .buttonStyle(.borderedProminent)
-        .buttonBorderShape(.capsule)
-        .tint(reward.claimed ? .gray : .opalPrimary)
-        .disabled(reward.claimed)
-        .animation(.smooth, value: reward.claimed)
-    }
 }
 
 #Preview {
-    RewardView(reward: .init(friendCountToUnlock: 20, title: "Some title", description: "Some long description", imageName: "person", claimed: true))
+    RewardView(reward: .init(friendCountToUnlock: 20, title: "Some title", description: "Some long description", imageName: "person", excludePremium: false, claimed: true))
         .padding()
         .infinite()
         .background(.opalBackground)
