@@ -19,7 +19,7 @@ struct DashedGroupBoxStyle: GroupBoxStyle {
                 Line()
                     .stroke(style: .init(lineWidth: 1, lineCap: .square, dash: [2, 3]))
                     .frame(maxHeight: 1)
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(.opalBorder)
                 
                 configuration.content
             }
@@ -29,7 +29,7 @@ struct DashedGroupBoxStyle: GroupBoxStyle {
         .background {
             RoundedRectangle(cornerRadius: 17)
                 .stroke(style: .init(lineWidth: 1, lineCap: .square, dash: [2, 3]))
-                .foregroundStyle(.white.opacity(0.5))
+                .foregroundStyle(.opalBorder)
         }
     }
 }

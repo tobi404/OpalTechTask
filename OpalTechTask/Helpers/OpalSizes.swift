@@ -15,6 +15,8 @@ extension CGFloat {
 // MARK: - Spacing
 
 extension CGFloat {
+    /// CGFloat: 4
+    static let opalTiny: CGFloat = 4
     /// CGFloat: 8
     static let opalSmall: CGFloat = 8
     /// CGFloat: 16

@@ -8,6 +8,11 @@
 import SwiftUI
 
 extension Font {
+    /// size: 11
+    static func opalCaption(_ weight: Weight? = nil) -> Font {
+        .system(size: 11, weight: weight)
+    }
+    
     /// size: 12
     static func opalFootnote(_ weight: Weight? = nil) -> Font {
         .system(size: 12, weight: weight)

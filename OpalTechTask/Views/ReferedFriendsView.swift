@@ -32,9 +32,7 @@ struct ReferedFriendsView: View {
                             .font(.opalFootnote(.semibold))
                     }
                     
-                    Rectangle()
-                        .fill(.indigo)
-                        .frame(height: 6)
+                    ProgressBar(progress: 0.3)
                         .padding(.top, 4)
                 }
             }

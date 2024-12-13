@@ -11,6 +11,12 @@ struct RefferalScreen: View {
     var body: some View {
         ScrollView {
             VStack(spacing: .opalLarge) {
+                RoundedRectangle(cornerRadius: 2)
+                    .frame(height: 4)
+                    .frame(maxWidth: 40)
+                    .foregroundStyle(.opalSecondary)
+                    .blendMode(.overlay)
+                
                 CardView()
                     .frame(minHeight: 184)
                 
@@ -20,30 +26,48 @@ struct RefferalScreen: View {
                     .foregroundStyle(.white)
                 
                 ReferedFriendsView()
-//                    .frame(minHeight: 155)
                 
                 VStack(spacing: .opalSmall) {
-                    Button("Add as a friend") {
+                    Button {
                         
+                    } label: {
+                        Label("Add Friends", systemImage: "person.crop.circle.badge.plus")
+                            .infiniteWidth(alignment: .center)
                     }
-                    .buttonStyle(.bordered)
                     
-                    Button("Share referal link") {
+                    Button {
                         
+                    } label: {
+                        Label("Share Referral Link", systemImage: "square.and.arrow.up")
+                            .infiniteWidth(alignment: .center)
+                            .foregroundStyle(.black)
                     }
-                    .buttonStyle(.bordered)
+                    .tint(.white)
                 }
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
                 
                 LazyVStack {
                     ForEach(0..<10) { num in
-                        RoundedRectangle(cornerRadius: 15.86)
-                            .fill(Color.indigo)
-                            .frame(minHeight: 133)
+                        VStack {
+                            RewardView()
+                            
+                            if num != 9 {
+                                Image(systemName: "arrow.down")
+                                    .foregroundStyle(.opalSecondary)
+                                    .padding(.vertical, .opalSmall)
+                            }
+                        }
                     }
                 }
             }
+            .padding(.opalMedium)
+            .background(alignment: .top) {
+                Image(.gradientHalo)
+                    .resizable()
+                    .scaledToFit()
+            }
         }
-        .contentMargins(.horizontal, 16)
         .background(.opalBackground)
     }
 }
