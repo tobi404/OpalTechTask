@@ -11,7 +11,7 @@ import SwiftUI
 struct OpalTechTaskApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RefferalScreen()
         }
     }
 }
