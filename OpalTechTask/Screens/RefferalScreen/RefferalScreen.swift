@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct RefferalScreen: View {
+    @State var vm = RefferalViewModel()
+    
     var body: some View {
         ScrollView {
             VStack(spacing: .opalLarge) {
@@ -28,16 +30,12 @@ struct RefferalScreen: View {
                 ReferedFriendsView()
                 
                 VStack(spacing: .opalSmall) {
-                    Button {
-                        
-                    } label: {
+                    ShareLink(item: URL(string: "https://opal.so/")!) {
                         Label("Add Friends", systemImage: "person.crop.circle.badge.plus")
                             .infiniteWidth(alignment: .center)
                     }
                     
-                    Button {
-                        
-                    } label: {
+                    ShareLink(item: URL(string: "https://opal.so/")!) {
                         Label("Share Referral Link", systemImage: "square.and.arrow.up")
                             .infiniteWidth(alignment: .center)
                             .foregroundStyle(.black)
@@ -48,11 +46,11 @@ struct RefferalScreen: View {
                 .buttonBorderShape(.capsule)
                 
                 LazyVStack {
-                    ForEach(0..<10) { num in
+                    ForEach(vm.rewards) { reward in
                         VStack {
-                            RewardView()
+                            RewardView(reward: reward)
                             
-                            if num != 9 {
+                            if reward != vm.rewards.last {
                                 Image(systemName: "arrow.down")
                                     .foregroundStyle(.opalSecondary)
                                     .padding(.vertical, .opalSmall)
@@ -69,6 +67,8 @@ struct RefferalScreen: View {
             }
         }
         .background(.opalBackground)
+        .onAppear(perform: vm.onAppear)
+        .environment(vm)
     }
 }
 

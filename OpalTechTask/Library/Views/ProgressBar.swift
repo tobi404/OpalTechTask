@@ -12,7 +12,7 @@ struct ProgressBar: View {
     private let progressToSet: Double
     
     init(progress: Double) {
-        progressToSet = max(0, min(1, progress))
+        progressToSet = progress
     }
     
     var body: some View {
@@ -31,6 +31,9 @@ struct ProgressBar: View {
             .animation(.smooth, value: progress)
             .onAppear {
                 progress = progressToSet
+            }
+            .onChange(of: progressToSet) { _, newValue in
+                progress = newValue
             }
     }
 }

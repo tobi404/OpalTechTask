@@ -9,12 +9,21 @@ import SwiftUI
 
 // TODO: Refactor components
 struct ReferedFriendsView: View {
+    @Environment(RefferalViewModel.self) var vm
+    
+    var progress: Double {
+        let count = vm.nextReward?.friendCountToUnlock ?? 0
+        return Double(vm.friends.count) / Double(count)
+    }
+    
     var body: some View {
         GroupBox {
             HStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(.indigo)
+                Image("person")
+                    .resizable()
+                    .scaledToFill()
                     .frame(width: 72, height: 72)
+                    .clipShape(.rect(cornerRadius: 10))
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Next Unlock:")
@@ -22,17 +31,18 @@ struct ReferedFriendsView: View {
                         .foregroundStyle(.opalSecondary)
                     
                     HStack {
-                        Text("1 Year of Opal Pro")
+                        Text(vm.nextReward?.title ?? "Reward title")
                             .font(.opalBody(.semibold))
                             .foregroundStyle(.opalPrimary)
                             .infiniteWidth()
                         
-                        Text("4/5")
+                        Text("\(vm.friends.count)/\(vm.nextReward?.friendCountToUnlock ?? 0)")
                             .foregroundStyle(.opalSecondary)
                             .font(.opalFootnote(.semibold))
                     }
+                    .redacted(reason: vm.nextReward == nil ? .placeholder : [])
                     
-                    ProgressBar(progress: 0.3)
+                    ProgressBar(progress: progress)
                         .padding(.top, 4)
                 }
             }
@@ -48,12 +58,12 @@ struct ReferedFriendsView: View {
                         Image(systemName: "person.fill")
                             .font(.footnote)
                         
-                        Text("3")
+                        Text("\(vm.friends.count)")
                             .font(.opalBody(.semibold))
                     }
                     
-                    Circle()
-                        .frame(maxWidth: 24, maxHeight: 24)
+                    FriendsStack(friends: vm.friends)
+                        .padding(.leading, .opalTiny)
                 }
             }
             .foregroundStyle(.opalPrimary)
@@ -67,4 +77,5 @@ struct ReferedFriendsView: View {
         .padding()
         .infinite()
         .background(.opalBackground)
+        .environment(RefferalViewModel())
 }

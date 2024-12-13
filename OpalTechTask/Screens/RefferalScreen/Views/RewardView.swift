@@ -14,36 +14,45 @@ enum RewardState {
 }
 
 struct RewardView: View {
-    @State var rewardState: RewardState = .canRedeem
+    let reward: RewardModel
+    @Environment(RefferalViewModel.self) var vm
+    
+    var progressReached: Bool {
+        vm.friends.count >= reward.friendCountToUnlock
+    }
+    
+    var progressBarValue: Double {
+        Double(vm.friends.count) / Double(reward.friendCountToUnlock)
+    }
     
     var body: some View {
         HStack(spacing: .opalLarge) {
-            RoundedRectangle(cornerRadius: 14)
-                .fill(.indigo)
+            Image(reward.imageName)
+                .resizable()
+                .scaledToFill()
+                .background(.opalBorder)
                 .frame(width: 100, height: 100)
+                .clipShape(.rect(cornerRadius: 14))
             
             VStack(alignment: .leading, spacing: .opalTiny) {
-                Text("1 FRIEND")
+                Text("^[\(reward.friendCountToUnlock) FRIEND](inflect: true)")
                     .font(.opalCaption(.semibold))
                     .foregroundStyle(.opalPrimary)
                     .gradientMask()
                 
-                Text("Loyal Gem")
+                Text(reward.title)
                     .font(.opalBody(.bold))
                     .foregroundStyle(.opalPrimary)
                 
-                Text("Unlock this special milestone")
+                Text(reward.description)
                     .font(.opalFootnote(.medium))
                     .foregroundStyle(.opalSecondary)
                 
-                switch rewardState {
-                case .unlocked, .canRedeem:
+                if progressReached {
                     unlockButton
                         .padding(.top, .opalSmall)
-                case .inProgress:
-                    Rectangle()
-                        .fill(.indigo)
-                        .frame(height: 6)
+                } else {
+                    ProgressBar(progress: progressBarValue)
                         .padding(.top, .opalSmall)
                 }
             }
@@ -59,31 +68,33 @@ struct RewardView: View {
     
     var unlockButton: some View {
         Button {
-            rewardState = rewardState == .unlocked ? .canRedeem : .unlocked
+            vm.claimDidTapped(for: reward)
         } label: {
             HStack(spacing: 2) {
-                if rewardState == .unlocked {
+                if reward.claimed {
                     Image(systemName: "checkmark")
                 }
                 
-                Text(rewardState == .unlocked ? "Claimed" : "Claim")
+                Text(reward.claimed ? "Claimed" : "Claim")
             }
-            .foregroundStyle(rewardState == .unlocked ? .gray : .black)
+            .foregroundStyle(reward.claimed ? .gray : .black)
             .frame(minWidth: 68)
             .font(.opalFootnote(.regular))
             .padding(.vertical, .opalTiny)
         }
         .buttonStyle(.borderedProminent)
         .buttonBorderShape(.capsule)
-        .tint(rewardState == .canRedeem ? .opalPrimary : .gray)
-        .disabled(rewardState != .canRedeem)
+        .tint(reward.claimed ? .gray : .opalPrimary)
+        .disabled(reward.claimed)
+        .animation(.smooth, value: reward.claimed)
     }
 }
 
 #Preview {
-    RewardView()
+    RewardView(reward: .init(friendCountToUnlock: 20, title: "Some title", description: "Some long description", imageName: "person", claimed: true))
         .padding()
         .infinite()
         .background(.opalBackground)
+        .environment(RefferalViewModel())
 }
 
